@@ -1,13 +1,12 @@
 import { HamburgerRoutes } from '@app/components/@molecules/HamburgerRoutes'
 import { SearchInput } from '@app/components/@molecules/SearchInput/SearchInput'
-import { LanugageDropdown } from '@app/components/LanguageDropdown'
 import { LeadingHeading } from '@app/components/LeadingHeading'
 import { useBreakpoint } from '@app/utils/BreakpointProvider'
 import { mq, Typography } from '@ensdomains/thorin'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
+import Typewriter from 'typewriter-effect'
 import ENSWithGradient from '../assets/ENSWithGradient.svg'
 
 const GradientTitle = styled.h1(
@@ -63,6 +62,7 @@ const Stack = styled.div(
 const Description = styled(Typography)(
   ({ theme }) => css`
     line-height: ${theme.lineHeights['1.5']};
+    color: rgb(35, 97, 120);
   `,
 )
 
@@ -83,31 +83,55 @@ const LogoAndLanguage = styled.div(
   `,
 )
 
+const GradientBG = styled(Typography)(
+  () => css`
+    color: #caf0f8;
+    background-image: linear-gradient(90deg, #03045e, #0096c7);
+    padding: 0 4px;
+    border-radius: 5px;
+  `,
+)
+
 export default function Page() {
   const { isReady } = useRouter()
-  const { t } = useTranslation('common')
   const breakpoints = useBreakpoint()
 
   return (
     <>
       <Head>
-        <title>ENS</title>
+        <title>Rave Names</title>
       </Head>
       {isReady && !breakpoints.md && (
         <LeadingHeading>
           <LogoAndLanguage>
             <StyledENS as={ENSWithGradient} />
-            <LanugageDropdown />
           </LogoAndLanguage>
-          <HamburgerRoutes />
         </LeadingHeading>
       )}
       <Container>
         <Stack>
-          <GradientTitle>{t('title')}</GradientTitle>
+          <GradientTitle>
+            {'Welcome to '}
+            <GradientBG>
+              <Typewriter
+                onInit={(typewriter: any | null) => {
+                  typewriter
+                    .typeString(' the cheapest registration fees in crypto')
+                    .pauseFor(2500)
+                    .deleteChars(40)
+                    .typeString('no renewal fees')
+                    .pauseFor(2500)
+                    .deleteChars(15)
+                    .typeString('Rave Names')
+                    .pauseFor(2500)
+                    .start()
+                }}
+              />
+            </GradientBG>
+          </GradientTitle>
           <SubtitleWrapper>
             <Description variant="large" color="textSecondary">
-              {t('description')}
+              The first web3 username system on Fantom
             </Description>
           </SubtitleWrapper>
           <SearchInput />

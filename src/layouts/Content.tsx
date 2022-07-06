@@ -172,7 +172,7 @@ export const Content = ({
   return (
     <>
       <Head>
-        <title>{title} - ENS</title>
+        <title>{title} - Rave</title>
       </Head>
 
       {breakpoints.md && WarningComponent}

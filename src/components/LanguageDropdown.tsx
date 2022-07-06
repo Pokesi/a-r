@@ -35,6 +35,9 @@ export const LanugageDropdown = ({ invert }: { invert?: boolean }) => {
 
   return i18n.options && router.isReady ? (
     <Dropdown
+      style={{
+        background: 'transparent'
+      }}
       direction={invert ? 'up' : 'down'}
       inner
       shortThrow={!isLarge}

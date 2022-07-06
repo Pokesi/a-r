@@ -47,7 +47,7 @@ export const NameListView = ({
     <TabWrapper>
       {currentPage.map((name) => {
         const isNativeEthName =
-          /\.eth$/.test(name.name) && name.name.split('.').length === 2
+          /\.ftm$/.test(name.name) && name.name.split('.').length === 2
         return (
           <NameDetailItem key={name.name} network={network} {...name}>
             <OtherItemsContainer>

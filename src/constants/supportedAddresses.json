@@ -1,1 +1,14 @@
-["btc", "bnb", "doge", "eth", "ltc", "dot", "sol"]
+[
+  "btc",
+  "bnb",
+  "doge",
+  "eth",
+  "ltc",
+  "dot",
+  "sol",
+  "avax",
+  "ftm",
+  "luna",
+  "xrp",
+  "bch"
+]

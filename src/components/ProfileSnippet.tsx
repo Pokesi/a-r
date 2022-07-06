@@ -1,6 +1,6 @@
 import TripleDot from '@app/assets/TripleDot.svg'
-import { useAvatar } from '@app/hooks/useAvatar'
 import { useZorb } from '@app/hooks/useZorb'
+import { useAvatar } from '@app/hooks/useAvatar'
 import { Avatar, Button, Typography } from '@ensdomains/thorin'
 import { useRouter } from 'next/router'
 import React from 'react'
@@ -13,15 +13,13 @@ const Container = styled.div<{ $banner?: string; $size?: 'small' | 'medium' }>(
     css`
       padding: ${$size === 'medium' ? theme.space['8'] : theme.space['6']};
       padding-top: ${theme.space['16']};
-      background-image: ${$banner
-        ? `url(${$banner})`
-        : theme.colors.gradients.blue};
+      background-image: radial-gradient(50% 50% at 50% 50%, #282c34, #3B3D46);
       background-repeat: no-repeat;
       background-attachment: scroll;
       background-size: 100% ${theme.space['28']};
-      background-color: ${theme.colors.background};
+      background-color: #3B3D46;
       border-radius: ${theme.radii['2xLarge']};
-      border: ${theme.space.px} solid ${theme.colors.borderTertiary};
+      /*border: ${theme.space.px} solid ${theme.colors.borderTertiary};*/
       box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.02);
       display: flex;
       flex-direction: column;
@@ -114,7 +112,6 @@ export const ProfileSnippet = ({
   button,
   size = 'small',
   buttonPlacement = 'inline',
-  network,
 }: {
   name: string
   banner?: string
@@ -124,12 +121,11 @@ export const ProfileSnippet = ({
   button?: 'viewDetails' | 'viewProfile'
   size?: 'small' | 'medium'
   buttonPlacement?: 'inline' | 'bottom'
-  network: number
 }) => {
   const router = useRouter()
   const { t } = useTranslation('common')
+  const { avatar } = useAvatar(name)
   const zorb = useZorb(name, 'name')
-  const { avatar } = useAvatar(name, network)
 
   return (
     <Container $banner={banner} $size={size} data-testid="profile-snippet">
@@ -168,6 +164,13 @@ export const ProfileSnippet = ({
       <TextStack>
         <DetailStack>
           <Name weight="bold">{name}</Name>
+          {avatar && (name !== 'z.ftm') && <Typography
+            data-testid="profile-snippet-name"
+            weight="bold"
+            color="textTertiary"
+          >
+            Avatar: <a href={avatar}>{avatar}</a>
+          </Typography>}
           {recordName && (
             <div style={{ marginTop: '4px' }}>
               <Typography

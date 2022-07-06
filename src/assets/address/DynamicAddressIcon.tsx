@@ -8,6 +8,11 @@ export const addressIconTypes = {
   ltc: dynamic(() => import('./AddressLitecoin.svg')),
   dot: dynamic(() => import('./AddressPolkadot.svg')),
   sol: dynamic(() => import('./AddressSolana.svg')),
+  ftm: dynamic(() => import('./AddressFantom.svg')),
+  xrp: dynamic(() => import('./AddressXRP.svg')),
+  bch: dynamic(() => import('./AddressBCH.svg')),
+  avax: dynamic(() => import('./AddressAvalance.svg')),
+  luna: dynamic(() => import('./AddressLuna.svg')),
 }
 
 export const DynamicAddressIcon = ({

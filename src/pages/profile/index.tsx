@@ -11,10 +11,32 @@ import { ContentGrid } from '@app/layouts/ContentGrid'
 import { useBreakpoint } from '@app/utils/BreakpointProvider'
 import { Button } from '@ensdomains/thorin'
 import { useRouter } from 'next/router'
-import { ReactElement } from 'react'
+import { ReactElement, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
-import { useAccount, useEnsName } from 'wagmi'
+import { useAccount } from 'wagmi'
+import { Rave, RaveName } from '@rave-names/rave'
+
+const rave = new Rave()
+
+const useRaveName = async (name: any) => {
+  let data: any
+  try {
+    await rave.resolveStringToAddress(name).then(async (res) => {
+      await rave.reverse(res).then((r) => {
+        data = r
+      })
+    })
+  } catch (e) {
+    data = {
+      name: '',
+      isOwned: false,
+      owner: '',
+      addresses: {},
+    }
+  }
+  return data
+}
 
 const DetailsWrapper = styled.div(
   ({ theme }) => css`
@@ -43,6 +65,10 @@ const SelfButtons = styled.div(
   `,
 )
 
+interface StrictOBJ {
+  [key: string]: string
+}
+
 export default function Page() {
   const router = useRouter()
   const { t } = useTranslation('profile')
@@ -56,35 +82,59 @@ export default function Page() {
   const { data: accountData, isLoading: accountLoading } = useAccount()
   const address = accountData?.address
 
-  const { data: ensName, isLoading: primaryLoading } = useEnsName({ address })
+  const [data, setData] = useState({
+    name: '',
+    isOwned: false,
+    owner: '',
+    addresses: {},
+  })
+  const [loadingName, setLoadingName] = useState(true)
 
-  const name = isSelf && ensName ? ensName : _name
+  useRaveName(_name).then((res) => {
+    setData(res)
+    if (typeof data.addresses !== 'object') {
+      setData({
+        ...data,
+        addresses: {
+          ftm: data.owner ? data.owner : '',
+        },
+      })
+    }
+    setLoadingName(false)
+  })
 
-  const {
-    isLoading: detailsLoading,
-    error,
-    profile,
-    ownerData,
-    expiryDate,
-    normalisedName,
-  } = useNameDetails(name)
+  const name = isSelf && data.name ? data.name : _name
 
-  const isLoading =
-    detailsLoading || primaryLoading || accountLoading || initial
+  const isLoading = accountLoading || loadingName
 
   useProtectedRoute(
     '/',
-    // When anything is loading, return true
+    // if is self, user must be connected
     isLoading
       ? true
-      : // if is self, user must be connected
-        (isSelf ? address : true) &&
+      : (isSelf ? address : true) &&
           typeof name === 'string' &&
           name.length > 0,
   )
 
-  const getTextRecord = (key: string) =>
-    profile?.records?.texts?.find((x) => x.key === key)
+  const normalisedName = name
+
+  const error = data.isOwned ? null : 'Name not owned'
+
+  const ownerData = {
+    owner: data.owner,
+  }
+
+  const getAddressRecord = (key: any): string => {
+    const entries = Object.entries(data.addresses as StrictOBJ)
+    for (let i = 0; i < entries.length; i += 1) {
+      const x = entries[i]
+      if (x[0] === key) {
+        return x[1] === '' ? 'None set' : x[1]
+      }
+    }
+    return 'None'
+  }
 
   return (
     <Content
@@ -104,26 +154,19 @@ export default function Page() {
             name={normalisedName}
             network={chainId}
             ownerData={ownerData}
-            expiryDate={expiryDate}
             showButton={!isSelf}
+            raveName={data}
           />
         ),
         trailing: (
           <DetailsWrapper>
             <ProfileSnippet
               name={normalisedName}
-              network={chainId}
-              url={getTextRecord('url')?.value}
-              description={getTextRecord('description')?.value}
-              recordName={getTextRecord('name')?.value}
               button={isSelf || breakpoints.md ? undefined : 'viewDetails'}
               size={breakpoints.md ? 'medium' : 'small'}
             />
             {isSelf && (
               <SelfButtons>
-                <Button shadowless variant="transparent" size="small">
-                  {t('editProfile')}
-                </Button>
                 <Button
                   onClick={() =>
                     router.push({
@@ -142,15 +185,13 @@ export default function Page() {
               </SelfButtons>
             )}
             <ProfileDetails
-              addresses={(profile?.records?.coinTypes || []).map(
-                (item: any) => ({
-                  key: item.coin,
-                  value: item.addr,
-                }),
-              )}
-              textRecords={(profile?.records?.texts || [])
-                .map((item: any) => ({ key: item.key, value: item.value }))
-                .filter((item: any) => item.value !== null)}
+              addresses={(typeof data.addresses === 'object'
+                ? Object.keys(data.addresses)
+                : []
+              ).map((item: any) => ({
+                key: item,
+                value: getAddressRecord(item) as string,
+              }))}
             />
           </DetailsWrapper>
         ),

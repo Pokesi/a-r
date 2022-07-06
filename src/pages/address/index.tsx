@@ -146,7 +146,6 @@ const Page = () => {
             {primaryProfile?.name ? (
               <ProfileSnippet
                 name={primaryProfile.name}
-                network={chainId}
                 button="viewProfile"
                 buttonPlacement={profileButtonPlacement}
                 description={getTextRecord('description')?.value}

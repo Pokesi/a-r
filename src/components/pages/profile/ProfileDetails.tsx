@@ -1,19 +1,13 @@
 import supportedAddresses from '@app/constants/supportedAddresses.json'
-import supportedProfileItems from '@app/constants/supportedProfileItems.json'
-import supportedTexts from '@app/constants/supportedTexts.json'
 import { Typography, mq } from '@ensdomains/thorin'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
-import {
-  AddressProfileButton,
-  OtherProfileButton,
-  SocialProfileButton,
-} from './ProfileButton'
+import { AddressProfileButton, OtherProfileButton } from './ProfileButton'
 
 const ProfileInfoBox = styled.div(({ theme }) => [
   css`
     padding: ${theme.space['4']} ${theme.space['4']};
-    background-color: ${theme.colors.background};
+    background-color: #282937;
     border: ${theme.space.px} solid ${theme.colors.borderTertiary};
     box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.02);
     border-radius: ${theme.radii['2xLarge']};
@@ -71,8 +65,8 @@ const ProfileSection = ({
 
   return condition ? (
     <div>
-      <SectionTitle color="textSecondary" weight="bold" size="base">
-        {t(label)}
+      <SectionTitle color="#FFF" weight="bold" size="base">
+        {'Addresses'}
       </SectionTitle>
       <Stack>
         {supportedArray.map(
@@ -103,38 +97,15 @@ const RecordsStack = styled.div(
 )
 
 export const ProfileDetails = ({
-  textRecords = [],
   addresses = [],
 }: {
-  textRecords: Array<Record<'key' | 'value', string>>
   addresses: Array<Record<'key' | 'value', string>>
 }) => {
-  const otherRecords = [
-    ...textRecords
-      .filter(
-        (x) =>
-          !supportedTexts.includes(x.key.toLowerCase()) &&
-          !supportedProfileItems.includes(x.key.toLowerCase()),
-      )
-      .map((x) => ({ ...x, type: 'text' })),
-  ]
-
-  if (!textRecords.length && !addresses.length) return null
+  if (!addresses.length) return null
 
   return (
     <ProfileInfoBox>
       <RecordsStack>
-        <ProfileSection
-          label="accounts"
-          condition={
-            textRecords &&
-            textRecords.filter((x) =>
-              supportedTexts.includes(x.key.toLowerCase()),
-            ).length > 0
-          }
-          array={textRecords}
-          button={SocialProfileButton}
-        />
         <ProfileSection
           label="addresses"
           type="address"
@@ -142,12 +113,6 @@ export const ProfileDetails = ({
           supported={supportedAddresses}
           array={addresses}
           button={AddressProfileButton}
-        />
-        <ProfileSection
-          label="otherRecords"
-          condition={otherRecords && otherRecords.length > 0}
-          array={otherRecords}
-          button={OtherProfileButton}
         />
       </RecordsStack>
     </ProfileInfoBox>

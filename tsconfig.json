@@ -11,14 +11,22 @@
       "plugins": [
         {
           "name": "typescript-styled-plugin",
-          "tags": ["styled", "css", "mq"]
+          "tags": [
+            "styled",
+            "css",
+            "mq"
+          ]
         }
       ]
     }
   },
   "compilerOptions": {
     "target": "es6",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "downlevelIteration": true,
     "allowJs": true,
     "skipLibCheck": true,
@@ -33,18 +41,30 @@
     "jsx": "preserve",
     "rootDir": ".",
     "baseUrl": ".",
-    "types": ["jest", "cypress", "@cloudflare/workers-types"],
+    "types": [
+      "jest",
+      "cypress",
+      "@cloudflare/workers-types"
+    ],
     "incremental": true,
     "paths": {
-      "@app/*": ["./src/*"]
+      "@app/*": [
+        "./src/*"
+      ]
     },
     "plugins": [
       {
         "name": "typescript-styled-plugin",
-        "tags": ["styled", "css", "mq"],
+        "tags": [
+          "styled",
+          "css",
+          "mq"
+        ],
         "validate": false,
         "lint": {
-          "validProperties": ["flex-gap"]
+          "validProperties": [
+            "flex-gap"
+          ]
         }
       }
     ]

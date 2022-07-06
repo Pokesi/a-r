@@ -17,6 +17,7 @@ import {
 import { ReactNode, useMemo, useState } from 'react'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import type { RaveName } from '@rave-names/rave'
 
 const ButtonWrapper = styled.div(
   ({ theme }) => css`
@@ -24,7 +25,7 @@ const ButtonWrapper = styled.div(
     & > button {
       border: 1px solid rgba(0, 0, 0, 0.06);
       box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.02);
-      background-color: ${theme.colors.background};
+      background: radial-gradient(50% 50% at 50% 50%, #282c34, #3B3D46)
       border-radius: ${theme.radii.extraLarge};
       & > div {
         width: 100%;
@@ -54,8 +55,8 @@ const Label = styled(Typography)(
 
 const Name = styled(Typography)(
   ({ theme }) => css`
-    color: ${theme.colors.text};
-    font-size: ${theme.fontSizes.small};
+    color: #FFF;
+    font-size: ${theme.fontSizes.medium || '21px'};
   `,
 )
 
@@ -160,6 +161,7 @@ const OwnerButtonWithPopup = ({
   label,
   description,
   canTransfer,
+  raveName,
 }: {
   address: string
   name?: string | null
@@ -167,14 +169,14 @@ const OwnerButtonWithPopup = ({
   label: string
   description: string
   canTransfer: boolean
+  raveName: RaveName
 }) => {
   const { t } = useTranslation('common')
   const { copy, copied } = useCopied()
   const [open, setOpen] = useState(false)
-  const { profile, loading } = useProfile(name!, !name)
+  const { loading } = useProfile(name!, !name)
 
-  const getTextRecord = (key: string) =>
-    profile?.records?.texts?.find((x) => x.key === key)
+  // console.log(name, ':', address)
 
   return (
     <>
@@ -186,6 +188,7 @@ const OwnerButtonWithPopup = ({
               address={address}
               name={name || undefined}
               network={network}
+              raveName={raveName}
             />
           </AvatarWrapper>
           <TextContainer>
@@ -202,18 +205,15 @@ const OwnerButtonWithPopup = ({
         onDismiss={() => setOpen(false)}
       >
         <InnerDialog>
-          {name && !loading && (
+          {/*{name && !loading && (
             <ProfileSnippetWrapper>
               <ProfileSnippet
                 name={name}
-                network={network}
                 button="viewProfile"
-                description={getTextRecord('description')?.value}
-                recordName={getTextRecord('name')?.value}
-                url={getTextRecord('url')?.value}
+                description={`${name}, a Rave Name`}
               />
             </ProfileSnippetWrapper>
-          )}
+          )}*/}
           <AddressCopyButton
             variant="transparent"
             size="extraSmall"
@@ -292,12 +292,14 @@ const OwnerButtonWithDropdown = ({
   network,
   label,
   canTransfer,
+  raveName,
 }: {
   address: string
   name?: string | null
   network: number
   label: string
   canTransfer: boolean
+  raveName: RaveName
 }) => {
   const { t } = useTranslation('common')
   const router = useRouterWithHistory()
@@ -346,7 +348,7 @@ const OwnerButtonWithDropdown = ({
       <OwnerButtonWrapperWithDropdown onClick={() => setIsOpen(true)}>
         <ContentWithDropdown>
           <Label ellipsis>{label}</Label>
-          <div style={{ flexGrow: 1 }} />
+          {/*<div style={{ flexGrow: 1 }} />*/}
           <OwnerRow data-testid={`${label.toLowerCase()}-data`}>
             <Name ellipsis>{name || shortenAddress(address)}</Name>
             <AvatarWrapper>
@@ -355,6 +357,7 @@ const OwnerButtonWithDropdown = ({
                 address={address}
                 name={name || undefined}
                 network={network}
+                raveName={raveName}
               />
             </AvatarWrapper>
           </OwnerRow>
@@ -372,6 +375,7 @@ export const OwnerButton = ({
   canTransfer,
   type = 'dialog',
   description,
+  raveName,
 }: {
   address: string
   network: number
@@ -379,13 +383,22 @@ export const OwnerButton = ({
   canTransfer: boolean
   type?: 'dropdown' | 'dialog'
   description: string
+  raveName: RaveName
 }) => {
   const { name } = usePrimary(address)
 
   if (type === 'dialog') {
     return (
       <OwnerButtonWithPopup
-        {...{ address, network, label, name, description, canTransfer }}
+        {...{
+          address,
+          network,
+          label,
+          name,
+          description,
+          canTransfer,
+          raveName,
+        }}
       />
     )
   }
@@ -397,6 +410,7 @@ export const OwnerButton = ({
       label={label}
       network={network}
       name={name}
+      raveName={raveName}
     />
   )
 }

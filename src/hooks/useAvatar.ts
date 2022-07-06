@@ -1,6 +1,10 @@
 import { useEns } from '@app/utils/EnsProvider'
 import { ensNftImageUrl, imageUrlUnknownRecord } from '@app/utils/utils'
+import { fallbackImage } from '@app/hooks/useRaveName'
 import { useQuery } from 'react-query'
+import { Rave, RaveName } from '@rave-names/rave'
+
+const rave = new Rave()
 
 const fetchImg = async (url: string) => {
   const response = await fetch(url)
@@ -12,10 +16,30 @@ const fetchImg = async (url: string) => {
   return undefined
 }
 
-export const useAvatar = (name: string | undefined, network: number) => {
+const getAvatarSRC = (name: string): string => {
+  const query = async () => {
+    const owner = await rave.resolveStringToAddress(name)
+    const data: RaveName = await rave.reverse(owner)
+    return data.avatar
+  }
+  // let a: string = ''
+  // query().then((res) => {
+  //   a = res
+  //   console.log(name, "|", res, ";;", a)
+  // })
+  const a = query();
+  // console.log(a)
+  return a
+}
+
+export const useAvatar = (
+  name: string | undefined,
+  network: number | undefined,
+) => {
   const { data, isLoading, status } = useQuery(
     ['getAvatar', name],
-    () => fetchImg(imageUrlUnknownRecord(name!, network)),
+    () => getAvatarSRC(name!),
+    // () => getAvatarSRC(name!),
     {
       enabled: !!name,
     },

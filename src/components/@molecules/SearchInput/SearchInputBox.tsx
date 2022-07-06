@@ -39,10 +39,11 @@ const StyledInputParent = () =>
   css(
     ({ theme }) => css`
       border-radius: ${theme.radii['2.5xLarge']};
-      background-color: ${theme.colors.backgroundSecondary};
+      border-color: #294D4A;
+      background-color: #3B3D46;
       transition: background-color 0.35s ease-in-out;
       &:focus-within {
-        background-color: ${theme.colors.white};
+        background-color: #4D4F56;
         & input::placeholder {
           color: transparent;
         }

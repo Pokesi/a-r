@@ -1,12 +1,11 @@
 import { AddressAvatar, AvatarWithZorb } from '@app/components/AvatarWithZorb'
 import { NFTWithPlaceholder } from '@app/components/NFTWithPlaceholder'
-import { useEns } from '@app/utils/EnsProvider'
 import { shortenAddress } from '@app/utils/utils'
 import { Button, Typography } from '@ensdomains/thorin'
 import { useRouter } from 'next/router'
-import { useQuery } from 'react-query'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import type { RaveName } from '@rave-names/rave'
 
 const Container = styled.div(
   ({ theme }) => css`
@@ -55,16 +54,16 @@ const OwnerWithEns = styled.div(
 const NameOwnerItem = ({
   address = '',
   network,
+  raveName,
 }: {
   address?: string
   network: number
+  raveName: RaveName
 }) => {
-  const { getName } = useEns()
-  const { data } = useQuery(['getName', address], () => getName(address), {
-    enabled: !!address,
-  })
+  const data = raveName
+  const hasEns = data?.isOwned && data?.name
 
-  const hasEns = data?.match && data?.name
+  console.log(data)
 
   if (hasEns) {
     return (
@@ -81,6 +80,8 @@ const NameOwnerItem = ({
             address={address}
             name={data.name}
             network={network}
+            src={data.avatar}
+            raveName={raveName}
           />
         </AvatarWrapper>
       </OwnerContainer>
@@ -91,7 +92,12 @@ const NameOwnerItem = ({
     <OwnerContainer>
       <Typography weight="bold">{shortenAddress(address)}</Typography>
       <AvatarWrapper>
-        <AddressAvatar address={address} label={address} />
+        <AddressAvatar
+          address={address}
+          src={data.avatar}
+          label={address}
+          raveName={raveName}
+        />
       </AvatarWrapper>
     </OwnerContainer>
   )
@@ -114,7 +120,7 @@ const NameDetailContainer = styled.div(
     gap: ${theme.space['2.5']};
     flex-gap: ${theme.space['2.5']};
     padding: ${theme.space['4']};
-    background-color: ${theme.colors.background};
+    background-color: #282937;
     border-radius: ${theme.radii['2xLarge']};
     border: ${theme.space.px} solid ${theme.colors.borderTertiary};
     box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.02);
@@ -143,15 +149,16 @@ export const NameDetailSnippet = ({
   ownerData,
   network,
   showButton,
+  raveName,
 }: {
   name: string
   expiryDate?: Date | null
   ownerData: {
     owner?: string
-    registrant?: string
   }
   network: number
   showButton?: boolean
+  raveName: RaveName
 }) => {
   const { t } = useTranslation('common')
   const router = useRouter()
@@ -170,16 +177,20 @@ export const NameDetailSnippet = ({
         </ItemContainer>
       )}
       <ItemContainer>
-        <LeftText weight="bold">{t('name.controller')}</LeftText>
-        <NameOwnerItem address={ownerData.owner} network={network} />
+        <LeftText weight="bold">{'Owner'}</LeftText>
+        <NameOwnerItem
+          address={ownerData.owner}
+          network={network}
+          raveName={raveName}
+        />
       </ItemContainer>
-      {ownerData.registrant && (
+      {/* {ownerData.registrant && (
         <ItemContainer>
           <LeftText weight="bold">{t('name.registrant')}</LeftText>
           <NameOwnerItem address={ownerData.registrant} network={network} />
         </ItemContainer>
-      )}
-      {showButton && (
+      )} */}
+      {false && (
         <ButtonWrapper>
           <Button
             onClick={() =>
@@ -207,6 +218,7 @@ export const NameSnippet = ({
   network,
   expiryDate,
   ownerData,
+  raveName,
   showButton,
 }: {
   name: string
@@ -216,6 +228,7 @@ export const NameSnippet = ({
     owner?: string
     registrant?: string
   }
+  raveName: RaveName
   showButton?: boolean
 }) => {
   return (
@@ -231,6 +244,7 @@ export const NameSnippet = ({
         ownerData={ownerData}
         network={network}
         showButton={showButton}
+        raveName={raveName}
       />
     </Container>
   )

@@ -8,7 +8,7 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useRef } from 'react'
 import useTransition, { TransitionState } from 'react-transition-state'
 import styled, { css, useTheme } from 'styled-components'
-import ENSFull from '../assets/ENSFull.svg'
+import ENSFull from '../assets/RaveFull.svg'
 import ENSWithGradient from '../assets/ENSWithGradient.svg'
 import { HamburgerMenu } from './@atoms/HamburgerMenu'
 import { RouteItem } from './@atoms/RouteItem'
@@ -151,7 +151,7 @@ export const Header = () => {
   return (
     <HeaderWrapper>
       <NavContainer>
-        <ConditionalWrapper
+        {/*<ConditionalWrapper
           condition={router.asPath !== '/'}
           wrapper={(children) => (
             <Link passHref href="/">
@@ -160,14 +160,14 @@ export const Header = () => {
           )}
         >
           {router.asPath === '/' ? (
-            <ENSFull height={space['12']} />
+            <ENSFull height={'3rem'} />
           ) : (
             <ENSWithGradient height={space['12']} />
           )}
-        </ConditionalWrapper>
-        {connected && (
+        </ConditionalWrapper>*/}
+        {/*{connected && (
           <HamburgerMenu align="left" dropdownItems={statefulRoutes} />
-        )}
+        )}*/}
         {router.asPath !== '/' && breakpoints.md && (
           <>
             <VerticalLine />
@@ -178,11 +178,10 @@ export const Header = () => {
         )}
         {((connected && (breakpoints.lg || router.asPath === '/')) ||
           !connected) && <div style={{ flexGrow: 1 }} />}
-        <RouteContainer
+        {/*<RouteContainer
           ref={routeContainerRef}
           $state={breakpoints.lg ? 'entered' : state}
         >
-          {/* eslint-disable-next-line no-nested-ternary */}
           {connected
             ? routesNoSearch.map((route) => (
                 <RouteItem
@@ -201,8 +200,8 @@ export const Header = () => {
                   <RouteItem key={route.name} route={route} asText />
                 ))
             : null}
-        </RouteContainer>
-        {!connected && <HamburgerMenu dropdownItems={statefulRoutes} />}
+        </RouteContainer>*/}
+        {/*{!connected && <HamburgerMenu dropdownItems={statefulRoutes} />}*/}
         {breakpoints.md && <HeaderConnect />}
       </NavContainer>
     </HeaderWrapper>

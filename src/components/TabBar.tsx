@@ -81,21 +81,6 @@ export const TabBar = () => {
                 <TabItems>
                   <RouteItem route={getRoute('search')} />
                   <RouteItem route={getRoute('names')} />
-                  <Link href={profileRoute.href} passHref>
-                    <a>
-                      <AvatarWrapper $active={activeRoute === 'profile'}>
-                        <Avatar
-                          label={profileRoute.label}
-                          src={ensAvatar || zorb}
-                        />
-                      </AvatarWrapper>
-                    </a>
-                  </Link>
-                  <RouteItem route={getRoute('favourites')} />
-                  <RouteItem
-                    route={getRoute('settings')}
-                    hasNotification={pendingTransactions.length > 0}
-                  />
                 </TabItems>
               ),
               noAccountBefore: (

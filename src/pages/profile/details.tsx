@@ -6,7 +6,6 @@ import More from '@app/components/pages/profile/[name]/details/MoreTab/MoreTab'
 import { RecordsTab } from '@app/components/pages/profile/[name]/details/RecordsTab'
 import { SubnamesTab } from '@app/components/pages/profile/[name]/details/SubnamesTab'
 import { useChainId } from '@app/hooks/useChainId'
-import { useNameDetails } from '@app/hooks/useNameDetails'
 import { Content } from '@app/layouts/Content'
 import { ContentGrid } from '@app/layouts/ContentGrid'
 import { useBreakpoint } from '@app/utils/BreakpointProvider'
@@ -16,6 +15,19 @@ import { ReactElement, useMemo, useState } from 'react'
 import styled, { css } from 'styled-components'
 import { useAccount } from 'wagmi'
 import { useTranslation } from 'react-i18next'
+import { Rave, RaveName } from '@rave-names/rave'
+
+const rave = new Rave()
+
+const useRaveName = async (name: any) => {
+  let data: any
+  await rave.resolveStringToAddress(name).then(async (res) => {
+    await rave.reverse(res).then((r) => {
+      data = r
+    })
+  })
+  return data
+}
 
 const DetailsContainer = styled.div(
   ({ theme }) => css`
@@ -97,40 +109,33 @@ export default function Page() {
   const { data: accountData, isLoading: accountLoading } = useAccount()
   const address = accountData?.address
 
-  const {
-    normalisedName,
-    expiryDate,
-    ownerData,
-    profile,
-    isLoading: detailsLoading,
-  } = useNameDetails(name)
+  let data: RaveName = {
+    name: '',
+    isOwned: false,
+    owner: '',
+  }
+  useRaveName(name).then((res) => {
+    data = res
+  })
+
+  const normalisedName = data.name
 
   const selfAbilities = useMemo(() => {
     const abilities = {
       canEdit: false,
       canSend: false,
-      canChangeOwner: false,
-      canChangeRegistrant: false,
     }
-    if (!address || !ownerData) return abilities
-    if (
-      ownerData.registrant === address ||
-      (!ownerData.registrant && ownerData.owner === address)
-    ) {
+    if (!address || !data) return abilities
+    if (data.owner === address) {
       abilities.canSend = true
-      abilities.canChangeOwner = true
-      abilities.canChangeRegistrant = true
-    }
-    if (ownerData.owner === address) {
       abilities.canEdit = true
-      abilities.canChangeOwner = true
     }
     return abilities
-  }, [address, ownerData])
+  }, [address, data])
 
-  const isLoading = detailsLoading || accountLoading
+  const isLoading = accountLoading
 
-  const [tab, setTab] = useState<'records' | 'subnames' | 'more'>('records')
+  const [tab, setTab] = useState<'records' | 'more'>('records')
 
   return (
     <Content
@@ -149,47 +154,26 @@ export default function Page() {
               />
             ) : (
               <NameSnippetMobile
-                expiryDate={expiryDate}
                 name={normalisedName}
                 network={chainId}
                 canSend={selfAbilities.canSend}
               />
             )}
             <OwnerButtons>
-              {ownerData?.owner && (
+              {data?.owner && (
                 <OwnerButton
-                  address={ownerData.owner}
+                  address={data.owner}
                   network={chainId}
-                  label={
-                    ownerData.ownershipLevel === 'nameWrapper'
-                      ? t('name.owner', { ns: 'common' })
-                      : t('name.controller', { ns: 'common' })
-                  }
+                  label={t('name.owner', { ns: 'common' })}
                   type={breakpoints.lg ? 'dropdown' : 'dialog'}
-                  description={
-                    ownerData.ownershipLevel === 'nameWrapper'
-                      ? t('details.descriptions.owner')
-                      : t('details.descriptions.controller')
-                  }
-                  canTransfer={selfAbilities.canChangeOwner}
-                />
-              )}
-              {ownerData?.registrant && (
-                <OwnerButton
-                  address={ownerData.registrant}
-                  network={chainId}
-                  label={t('name.registrant', { ns: 'common' })}
-                  type={breakpoints.lg ? 'dropdown' : 'dialog'}
-                  description={t('details.descriptions.registrant')}
-                  canTransfer={selfAbilities.canChangeRegistrant}
+                  description={t('details.descriptions.owner')}
+                  canTransfer={selfAbilities.canSend}
+                  raveName={data}
                 />
               )}
             </OwnerButtons>
             {breakpoints.md && (
-              <DetailSnippet
-                canSend={selfAbilities.canSend}
-                expiryDate={expiryDate}
-              />
+              <DetailSnippet canSend={selfAbilities.canSend} />
             )}
           </DetailsContainer>
         ),
@@ -198,9 +182,7 @@ export default function Page() {
             <RecordsTab
               network={chainId}
               name={normalisedName}
-              texts={(profile?.records?.texts as any) || []}
-              addresses={(profile?.records?.coinTypes as any) || []}
-              contentHash={profile?.records?.contentHash}
+              addresses={(data.addresses as any) || []}
               canEdit={selfAbilities.canEdit}
             />
           ),
@@ -215,14 +197,6 @@ export default function Page() {
             >
               <Typography weight="bold">
                 {t('details.tabs.records.label')}
-              </Typography>
-            </TabButton>
-            <TabButton
-              $selected={tab === 'subnames'}
-              onClick={() => setTab('subnames')}
-            >
-              <Typography weight="bold">
-                {t('details.tabs.subnames.label')}
               </Typography>
             </TabButton>
             <TabButton

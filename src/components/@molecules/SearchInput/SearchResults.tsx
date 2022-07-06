@@ -2,6 +2,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/interactive-supports-focus */
 import { useAvatar } from '@app/hooks/useAvatar'
+import { useName } from '@app/hooks/useName'
 import { useChainId } from '@app/hooks/useChainId'
 import { usePrimary } from '@app/hooks/usePrimary'
 import {
@@ -28,26 +29,27 @@ const SearchItem = styled.div<{
     gap: ${theme.space['2']};
     height: ${theme.space['14']};
     padding: 0 ${theme.space['4']};
-    border-bottom: ${theme.borderWidths['0.375']} ${theme.borderStyles.solid}
-      ${theme.colors.borderTertiary};
+    border-bottom: ${theme.borderWidths['0.375']} solid
+      #282937;
+    opacity: 0.95;
     &:last-of-type {
       border-bottom: 0;
     }
+    background: #282937;
     position: relative;
-    opacity: 0.6;
     ${$clickable &&
     css`
       cursor: pointer;
     `}
     ${$selected &&
     css`
-      background-color: ${theme.colors.background};
+      background-color: #282937;
       opacity: 1;
     `}
     ${$error &&
     css`
-      background-color: rgba(${theme.accentsRaw.red}, 0.1);
-      color: ${theme.colors.red};
+      background-color: #282937;
+      color: #282937;
     `}
     ${$clickable &&
     $selected &&
@@ -60,8 +62,7 @@ const SearchItem = styled.div<{
         position: absolute;
         height: ${theme.space['3']};
         width: ${theme.space['3']};
-        background-color: ${theme.colors.foreground};
-        opacity: 0.4;
+        background-color: #282937;
         right: ${theme.space['3']};
       }
     `}
@@ -126,7 +127,6 @@ const StyledTag = styled(Tag)(
 
 const AddressTag = styled(StyledTag)(
   ({ theme }) => css`
-    border: ${theme.borderWidths['0.375']} solid ${theme.colors.borderSecondary};
     background-color: transparent;
   `,
 )
@@ -147,9 +147,9 @@ const SpinnerWrapper = styled.div(
 
 const AddressResultItem = ({ address }: { address: string }) => {
   const { t } = useTranslation('common')
-  const primary = usePrimary(address)
   const network = useChainId()
-  const { avatar } = useAvatar(primary.name || undefined, network)
+  const { primary } = useName(address)
+  const { avatar } = useAvatar(primary.name || undefined)
   const zorb = useZorb(address, 'address')
 
   return (
@@ -170,46 +170,20 @@ const AddressResultItem = ({ address }: { address: string }) => {
   )
 }
 
-const GracePeriodTag = styled(StyledTag)(
-  ({ theme }) => css`
-    color: ${theme.colors.yellow};
-    background-color: rgba(${theme.accentsRaw.yellow}, 0.1);
-  `,
-)
-
-const PremiumTag = styled(StyledTag)(
-  ({ theme }) => css`
-    color: ${theme.colors.purple};
-    background-color: rgba(${theme.accentsRaw.purple}, 0.1);
-  `,
-)
-
 const StatusTag = ({ status }: { status: RegistrationStatus }) => {
   const { t } = useTranslation('common')
   switch (status) {
     case 'registered': {
       return <StyledTag>{t(`search.status.${status}`)}</StyledTag>
     }
-    case 'gracePeriod': {
-      return <GracePeriodTag>{t(`search.status.${status}`)}</GracePeriodTag>
-    }
-    case 'premium': {
-      return <PremiumTag>{t(`search.status.${status}`)}</PremiumTag>
-    }
     case 'available': {
       return <StyledTag tone="green">{t(`search.status.${status}`)}</StyledTag>
     }
-    case 'notOwned': {
-      return <StyledTag tone="blue">{t(`search.status.${status}`)}</StyledTag>
-    }
     case 'notImported': {
-      return <StyledTag tone="blue">{t(`search.status.${status}`)}</StyledTag>
-    }
-    case 'short': {
-      return <StyledTag tone="red">{t(`search.status.${status}`)}</StyledTag>
+      return <></>
     }
     default: {
-      return <StyledTag tone="red">{t(`search.status.${status}`)}</StyledTag>
+      return <StyledTag tone="green">{t(`search.status.available`)}</StyledTag>
     }
   }
 }
@@ -317,7 +291,7 @@ export const SearchResult = ({
 
   const input = useMemo(() => {
     if (type === 'nameWithDotEth') {
-      return `${value!}.eth`
+      return `${value!}.ftm`
     }
     return value
   }, [type, value])
@@ -325,8 +299,9 @@ export const SearchResult = ({
   const clickable = useMemo(() => {
     if (type === 'name' || type === 'nameWithDotEth') {
       const labels = input.split('.')
-      const isDotETH = labels.length === 2 && labels[1] === 'eth'
-      if (isDotETH && labels[0].length < 3) {
+      const isValid =
+        (labels.length === 2 && labels[1] === 'ftm') || input.startsWith('0x')
+      if (!isValid) {
         return false
       }
     }

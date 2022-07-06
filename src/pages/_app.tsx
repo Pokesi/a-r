@@ -48,7 +48,7 @@ body {
 }
 
 body {
-  background: radial-gradient(50% 50% at 50% 50%, rgba(82, 152, 255, 0.062) 0%, rgba(255, 255, 255, 0) 100%), #F7F7F7;
+  background: radial-gradient(50% 50% at 50% 50%, #282c34, #3B3D46)
 }
 
 body, .min-safe {

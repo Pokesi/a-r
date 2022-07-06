@@ -50,8 +50,6 @@ const SearchResultsContainer = styled.div<{
     background-color: #f7f7f7;
     box-shadow: 0px 2px 12px rgba(${theme.shadesRaw.foreground}, 0.04);
     border-radius: ${theme.radii.extraLarge};
-    border: ${theme.borderWidths.px} ${theme.borderStyles.solid}
-      ${$error ? theme.colors.red : theme.colors.borderTertiary};
 
     overflow: hidden;
 
@@ -319,7 +317,7 @@ export const SearchInput = ({
     if (selectedItem.type === 'nameWithDotEth') {
       selectedItem = {
         type: 'name',
-        value: `${normalisedName}.eth`,
+        value: `${normalisedName}.ftm`,
       }
     }
     if (!selectedItem.value) {
@@ -445,7 +443,7 @@ export const SearchInput = ({
       $error={!isValid && inputVal !== ''}
     >
       {searchItems.map((item, index) => (
-        <SearchResult
+        (index<3 && <SearchResult
           clickCallback={handleSearch}
           hoverCallback={handleHover}
           index={index}
@@ -454,7 +452,7 @@ export const SearchInput = ({
           usingPlaceholder={item.isHistory ? false : usingPlaceholder}
           key={`${item.type}-${item.value}`}
           value={item.value || normalisedName}
-        />
+        />)
       ))}
     </SearchResultsContainer>
   )
